@@ -7,13 +7,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
+#Estados posibles
 class EstadoArriendo(str, Enum):
     ACTIVO = "ACTIVO"
     DEVUELTO = "DEVUELTO"
 
+#Registro de un préstamo de equipos a un cliente durante un rango de fechas
 class Arriendo(Base):
-
     __tablename__ = "arriendos"
     __table_args__ = (
         CheckConstraint("cantidad > 0", name="ck_arriendo_cantidad_positiva"),

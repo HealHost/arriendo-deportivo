@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
+#Representa a una persona o empresa que arrienda
 class Cliente(Base):
     __tablename__ = "clientes"
 
