@@ -171,6 +171,7 @@ class FrameClientes(ttk.Frame):
             return
         except RegistroNoEncontradoError as error:
             messagebox.showerror("Cliente no encontrado", str(error), parent=self)
+            return
         except Exception as error:
             messagebox.showerror("Error inesperado", f"No se pudo eliminar el cliente.\n{error}", parent=self)
             return
