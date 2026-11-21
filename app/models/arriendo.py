@@ -1,11 +1,12 @@
 from datetime import date
 from enum import Enum
 from typing import TYPE_CHECKING
-
 from sqlalchemy import Date, Enum as SQLEnum, ForeignKey, Integer, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from app.database import Base
+if TYPE_CHECKING:
+    from app.models.equipo import Equipo
+    from app.models.cliente import Cliente
 
 #Estados posibles
 class EstadoArriendo(str, Enum):
