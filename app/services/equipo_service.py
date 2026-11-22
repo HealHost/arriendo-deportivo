@@ -32,12 +32,13 @@ def _validar_datos(nombre, precio_diario, stock_total):
 
     return nombre, precio_diario, stock_total
 
+
 def crear_equipo(nombre, categoria_id, precio_diario, stock_total):
     nombre, precio_diario, stock_total = _validar_datos(nombre, precio_diario, stock_total)
     
     with SessionLocal() as session:
         if session.get(Categoria, categoria_id) is None:
-            raise RegistroNoEncontradoError("La categoria seleccionada no existe.")
+            raise RegistroNoEncontradoError("La categoría seleccionada no existe.")
 
         equipo = Equipo(
             nombre=nombre,
@@ -50,3 +51,64 @@ def crear_equipo(nombre, categoria_id, precio_diario, stock_total):
         session.commit()
         return equipo
 
+
+def listar_equipos(solo_disponibles=False):
+    consulta = select(Equipo).options(joinedload(Equipo.categoria)).order_by(Equipo.nombre)
+    if solo_disponibles is True:
+        consulta = consulta.where(Equipo.stock_disponible > 0)
+    with SessionLocal() as session:
+        return list(session.scalars(consulta))
+
+
+def obtener_equipo(equipo_id):
+    with SessionLocal() as session:
+        equipo = session.get(Equipo, equipo_id)
+        if equipo is None:
+            raise RegistroNoEncontradoError("El equipo seleccionado no existe.")
+        return equipo
+
+
+def actualizar_equipo(equipo_id, nombre, categoria_id, precio_diario, stock_total):
+    nombre, precio_diario, stock_total = _validar_datos(
+        nombre, precio_diario, stock_total
+    )
+
+    with SessionLocal() as session:
+        equipo = session.get(Equipo, equipo_id)
+        if equipo is None:
+            raise RegistroNoEncontradoError("El equipo no existe.")
+
+        if session.get(Categoria, categoria_id) is None:
+            raise RegistroNoEncontradoError("La categoría seleccionada no existe.")
+
+        arrendadas = equipo.stock_total - equipo.stock_disponible
+        if stock_total < arrendadas:
+            raise DatosInvalidosError(
+                f"El stock total no puede ser menor a {arrendadas}, "
+                "que son las unidades actualmente arrendadas."
+            )
+
+        equipo.nombre = nombre
+        equipo.categoria_id = categoria_id
+        equipo.precio_diario = precio_diario
+        equipo.stock_total = stock_total
+        equipo.stock_disponible = stock_total - arrendadas
+
+        session.commit()
+        return equipo
+
+
+def eliminar_equipo(equipo_id):
+    with SessionLocal() as session:
+        equipo = session.get(Equipo, equipo_id)
+        if equipo is None:
+            raise RegistroNoEncontradoError("El equipo no existe.")
+
+        if equipo.arriendos:
+            raise RegistroVinculadoError(
+                f"No se puede eliminar '{equipo.nombre}': tiene "
+                f"{len(equipo.arriendos)} arriendo(s) asociado(s)."
+            )
+
+        session.delete(equipo)
+        session.commit()
