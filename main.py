@@ -1,5 +1,6 @@
 from app.database import init_db
-from app.models import arriendo, cliente 
+from app.models.arriendo import *
+from app.models.cliente import * 
 from app.gui.ventana_principal import VentanaPrincipal
 
 

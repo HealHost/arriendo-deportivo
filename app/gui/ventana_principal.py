@@ -18,7 +18,7 @@ class VentanaPrincipal(tk.Tk):
         self.minsize(900, 600)
 
         #contenedor de pestañas.
-        self._noteCook = ttk.Notebook(self)
+        self._notebook = ttk.Notebook(self)
         self._notebook.pack(fill="both", expand=True, padx=8, pady=8)
 
         #Creamos los frames y los guardamos en atributos para poder
